@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+	<head>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+		<link href="main.css" type="stylesheet" />
+		<meta charset="utf-8" />
+		<title>Simple Cube Timer V. 0.0.0</title>
+	</head>
+	<body>
+		<script type="module">
+			import { randomScrambleForEvent } from "https://cdn.cubing.net/js/cubing/scramble";
+
+
+
+			//const scramble = randomScrambleForEvent("333"); console.log(scramble.toString());
+			const decimalCount = num => {
+			// Convert to String
+			const numStr = String(num);
+			// String Contains Decimal
+			if (numStr.includes('.')) {
+				return numStr.split('.')[1].length;
+			};
+			// String Does Not Contain Decimal
+			return 0;
+			}
+			//set first scramble
+
+			let times = [0]
+			let timerDisplayValue
+			let timerValue = timerDisplayValue = 0
+			let go = false
+			const timerIncrementValue = 10
+			
+			document.addEventListener('keydown', (e) => {
+				if (go == false) {
+					document.getElementById('timer').classList.remove('text-secondary')
+					document.getElementById('timer').classList.add("text-success");
+				}}
+			);
+			document.addEventListener('keyup', (e) => {
+				if (e.key === " ") {
+					if (go == false) { go = true}
+					else {
+						//update times list/table
+						go = false
+						//change color
+						document.getElementById('timer').classList.remove('text-succses')
+						document.getElementById('timer').classList.add("text-secondary");
+						//get table html obj
+						let TimeTable = document.getElementById("timesList");
+						//add the current time to time list array
+						times.push(parseFloat(timerDisplayValue))
+						console.log(times)
+						TimeTable.innerHTML = "";
+						//generate table
+						for(let i = times.length-1; i > 0; i-=1) {
+							if (i < 5) {
+								TimeTable.innerHTML += "<tr><td>"+ String(i) + "</td><td>" + String(times[i]) + "</td><td>---</td></tr>";
+							} else {
+								//ao5 functionality
+								let ao5 = []
+								for(let j = 0; j < 5; j++) { ao5.push(times[i-j]) }
+								console.log(ao5)
+								console.log(ao5.sort((a,b) => a-b))
+								ao5.pop()
+								ao5.shift()
+								console.log(ao5)
+								let ao5Display = Math.round(100*((ao5[0]+ao5[1]+ao5[2])/3))/100
+								TimeTable.innerHTML += "<tr><td>"+ String(i) + "</td><td>" + String(times[i]) + "</td><td>"+ String(ao5Display) + "</td></tr>";
+							}
+							//check if last 10 times have been displayed
+							if (times.length-i > 9) {
+								i = -1 //terminate loop
+							}
+					};
+					}
+				}
+				}
+			);
+			setInterval(function () {
+				if (go) {
+				timerValue += 0.01
+				timerValue = Math.round(timerValue*100)/100
+				timerDisplayValue = String(timerValue)
+				if (decimalCount(timerValue) === 1) {
+					timerDisplayValue = timerDisplayValue + "0"
+				}
+				document.getElementById('timer').innerText = timerDisplayValue;
+
+			} else {
+
+				timerValue = timerDisplayValue = 0
+			}
+		}, timerIncrementValue);
+
+		// button functionality //
+		let showTimes = document.getElementById('show-all-times');
+		let DeleteTimes = document.getElementById('delete-all-times');
+		let ShowStats = document.getElementById('show-current-stats');
+		
+		showTimes.addEventListener('click', () => {
+			console.log("Showing times")
+			document.getElementById('timer-with-last-10-times').style.display = "hidden"
+		})
+
+		</script>
+		<div class="only-times" style="display: hidden;">
+			<table class=" table table-responsive-md" style="height: 24em; overflow-y: scroll;">
+				<tbody id="timesList-only-times only-times" style="display: hidden;">
+
+				</tbody>
+			</table>
+		</div>
+		<div class="btn-group">
+
+		</div>
+		<div class="text-center" id="timer-with-last-10-times">
+			<h3>Times List</h3>
+			<h1 id="scramble text-center"></h1>
+			<div class="table-responsive-md">
+			<table class=" table table-responsive-md" style="height: 24em; overflow-y: scroll;">
+				<thead class="table-primary">
+					<tr>
+						<td>Solve #</td>
+						<td>Time</td>
+						<td>AO5</td>
+					</tr>
+				</thead>
+				<tbody id="timesList">
+
+				</tbody>
+			</table>
+		</div>
+			<div id="placeholder" style="height: 24em; width: 100%;"></div>
+			<div class="text-center">
+				<h1 id="timer" class="font-monospace text-secondary">0.00</h1>
+			</div>
+		</div>
+	</body>
+</html>
