@@ -1,4 +1,5 @@
 'use strict';
+const dev = true;
 const path = require('path');
 const {app, Menu, shell} = require('electron');
 const {
@@ -175,5 +176,8 @@ if (is.development) {
 		submenu: debugSubmenu
 	});
 }
-
+if (dev) {
 module.exports = Menu.buildFromTemplate(template);
+} else {
+	module.exports = Menu.buildFromTemplate([]);
+}

@@ -8,7 +8,37 @@
 	</head>
 	<body>
 		<script type="module">
-			import { randomScrambleForEvent } from "https://cdn.cubing.net/js/cubing/scramble";
+			let previous = 0
+			let scramblehtml = document.getElementById('scramble');
+			function generateScramble3x3 () {
+				let scramblePart
+				let scramble = scramblePart = ""
+				let previous = 0
+				for(let i = 0; i < 25; i++){
+					scramblePart = ""
+					let moveType = previous
+					while (moveType == previous) {
+						moveType = Math.round(Math.random() * 5) + 1
+					}
+					console.log(moveType)
+					if (moveType == 1) { scramblePart = scramblePart + "U" };
+					if (moveType == 2) { scramblePart = scramblePart + "D" };
+					if (moveType == 3) { scramblePart = scramblePart + "R" };
+					if (moveType == 4) { scramblePart = scramblePart + "L" };
+					if (moveType == 5) { scramblePart = scramblePart + "F" };
+					if (moveType == 6) { scramblePart = scramblePart + "B" };
+					let moveAudjustment = Math.round(Math.random() * 2) + 1
+					if (moveAudjustment == 1) { scramblePart = scramblePart + "\'" }
+					if (moveAudjustment == 2) { scramblePart = scramblePart + "2" }
+					scramblePart = scramblePart + " "
+					console.log(scramblePart)
+					scramble = scramble + scramblePart
+					previous = moveType
+			} 
+			return scramble 
+		}   
+			let currentScramble = generateScramble3x3();
+			scramblehtml.innerText = currentScramble;
 
 
 
@@ -49,30 +79,38 @@
 						//get table html obj
 						let TimeTable = document.getElementById("timesList");
 						//add the current time to time list array
-						times.push(parseFloat(timerDisplayValue))
+						times.push({ "time" : parseFloat(timerDisplayValue), "scramble": currentScramble})
 						console.log(times)
 						TimeTable.innerHTML = "";
 						//generate table
+						/*
+							fix the current scramble table functionality so it only updates the current value
+							also update the thead to add the scramble col
+						*/
 						for(let i = times.length-1; i > 0; i-=1) {
 							if (i < 5) {
-								TimeTable.innerHTML += "<tr><td>"+ String(i) + "</td><td>" + String(times[i]) + "</td><td>---</td></tr>";
+								TimeTable.innerHTML += "<tr><td>"+ String(i) + "</td><td>" + String(times[i].time) + "</td><td>---</td><td>" + times[i].scramble +"</td></tr>";
 							} else {
 								//ao5 functionality
 								let ao5 = []
-								for(let j = 0; j < 5; j++) { ao5.push(times[i-j]) }
+								for(let j = 0; j < 5; j++) { ao5.push(times[i-j].time) }
 								console.log(ao5)
 								console.log(ao5.sort((a,b) => a-b))
 								ao5.pop()
 								ao5.shift()
 								console.log(ao5)
 								let ao5Display = Math.round(100*((ao5[0]+ao5[1]+ao5[2])/3))/100
-								TimeTable.innerHTML += "<tr><td>"+ String(i) + "</td><td>" + String(times[i]) + "</td><td>"+ String(ao5Display) + "</td></tr>";
+								TimeTable.innerHTML += "<tr><td>"+ String(i) + "</td><td>" + String(times[i].time) + "</td><td>"+ String(ao5Display) + "</td><td>" + times[i].scramble +"</td></tr>";
 							}
 							//check if last 10 times have been displayed
 							if (times.length-i > 9) {
 								i = -1 //terminate loop
 							}
 					};
+					//upadate scramble
+					currentScramble = generateScramble3x3();
+					scramblehtml.innerText = currentScramble;
+
 					}
 				}
 				}
@@ -94,14 +132,7 @@
 		}, timerIncrementValue);
 
 		// button functionality //
-		let showTimes = document.getElementById('show-all-times');
-		let DeleteTimes = document.getElementById('delete-all-times');
-		let ShowStats = document.getElementById('show-current-stats');
-		
-		showTimes.addEventListener('click', () => {
-			console.log("Showing times")
-			document.getElementById('timer-with-last-10-times').style.display = "hidden"
-		})
+
 
 		</script>
 		<div class="only-times" style="display: hidden;">
@@ -124,6 +155,7 @@
 						<td>Solve #</td>
 						<td>Time</td>
 						<td>AO5</td>
+						<td>Scramble</td>
 					</tr>
 				</thead>
 				<tbody id="timesList">
@@ -135,6 +167,8 @@
 			<div class="text-center">
 				<h1 id="timer" class="font-monospace text-secondary">0.00</h1>
 			</div>
+			<div id="placeholder" style="height: 16em; width: 100%;"></div>
+			<h2 id="scramble">a</h2>
 		</div>
 	</body>
 </html>

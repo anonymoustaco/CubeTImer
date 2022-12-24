@@ -7,6 +7,7 @@ const unhandled = require('electron-unhandled');
 const debug = require('electron-debug');
 const contextMenu = require('electron-context-menu');
 const menu = require('./menu.js');
+const dev = true;
 
 unhandled();
 debug();
@@ -79,6 +80,10 @@ app.on('activate', async () => {
 
 (async () => {
 	await app.whenReady();
-	Menu.setApplicationMenu(menu);
+	if (dev) {
+		Menu.setApplicationMenu(menu);
+	} else {
+		Menu.setApplicationMenu(Menu.buildFromTemplate([]))
+	}
 	mainWindow = await createMainWindow();
 })();
